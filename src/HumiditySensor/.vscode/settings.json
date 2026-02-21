@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./server/Controllers",
+        "./server/externalLibraries"
+    ]
+}

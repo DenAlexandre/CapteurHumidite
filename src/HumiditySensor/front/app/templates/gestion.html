@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}Gestion{% endblock %}
+{% block body %}
+  <div class="jumbotron">
+    <h1>Page de gestion</h1>
+    <p class="lead" id="titre">Gestionnaire de l'application.</p>
+  </div>
+  <div>
+    <form>
+      <input type="button" id="btn_reset" value="Redémarrer le raspberry" />
+    </form>
+  </div>
+  <div>
+    <form>
+      <br><br>
+      <label for="consigne">Consigne (10-100):</label>
+      <input type="number" id="consigne" name="consigne" min="10" max="100"/><br>
+      <input type="button" id="btn_valider" value="Valider" /><br>
+      <div class = "success" id="d1">
+        <h3 style="background-color:rgb(52, 184, 48);">La consigne a bien été prise en compte !</h3>
+      </div>
+    </form>
+    <span id="span_mode">
+      <input type="checkbox" id="cb_manual" name="manuel" unchecked />
+      <label>Mode Manuel</label>
+    </span>
+    <br><br>
+    <span id="span_ventil">
+      <input type="checkbox" id="cb_ventil" name="ventil" unchecked />
+      <label>Ventilation</label>
+    </span>
+  </div>
+
+  <script>
+
+      const span_ventil = document.querySelector("#span_ventil");
+      const cb_ventil = document.querySelector("#cb_ventil");
+      const cb_manual = document.querySelector("#cb_manual");
+      var btn = document.querySelector("#btn_reset");
+      var btn_valider = document.querySelector("#btn_valider");
+      var txt = document.querySelector("#titre");
+      var cons = document.querySelector("#consigne");
+      var d1 = document.querySelector("#d1");
+
+      init();
+
+      async function init() {
+        d1.style.visibility = "hidden";
+        var rep_manual = await GetConfigManual();
+        var rep_consigne = await GetConsigne();
+        cons.value = parseInt(rep_consigne);
+        if (rep_manual == 1)
+          cb_manual.checked = true;
+        else
+          cb_manual.checked = false;
+
+        span_ventil.style.display = "none";
+        cb_ventil.addEventListener("change", changeChkboxVentil);
+        cb_manual.addEventListener("change", changeChkboxManual);
+        btn.addEventListener("click", updateBtn);
+        btn_valider.addEventListener("click", updateBtnValider);
+      }
+
+      async function GetConfigManual() {
+
+        const apiEndpoint = 'http://raspberrypizero:3000/get_config'; 
+        //r = requests.get(apiEndpoint)
+        const response = await fetch(apiEndpoint);
+        const conf = await response.json();
+        console.log(conf);
+        const rep = conf['reponse'][1][2];
+        console.log(rep);
+        return rep;
+
+      }
+
+      async function GetConsigne() {
+
+        const apiEndpoint = 'http://raspberrypizero:3000/get_config'; 
+        const response = await fetch(apiEndpoint);
+        const conf =  await response.json();
+        console.log(conf);
+        const rep = conf['reponse'][0][2];
+        console.log(rep);
+        return rep;
+
+      }
+
+      function changeChkboxManual() {
+        //s.style.display = "" : s.style.display = "none";
+        // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+        const apiEndpoint = 'http://raspberrypizero:3000/set_config'; 
+        const mode = cb_manual.checked;
+        let cb_check = "0";
+
+        if (mode)
+        {
+          span_ventil.style.display = "";
+          cb_check = "1";
+        }
+        else
+        {
+          span_ventil.style.display = "none";
+          cb_check = "0"
+        } 
+
+        let config = {
+          field :"mode_manual",
+          value : cb_check
+        };
+
+        // Faire une requête GET à l'API
+        const response = fetch(apiEndpoint,
+        {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify(config)
+        });
+
+      }
+
+      function changeChkboxVentil() {
+        // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+        const apiEndpoint = 'http://raspberrypizero:3000/set_outputRelayPin17';
+        //const apiEndpoint = 'http://raspberrypizero:3000/set_config';
+        const cmd_ventil = cb_ventil.checked;
+        let ventil = "false";
+        if (cmd_ventil) 
+          ventil = "true";
+
+        let config = {
+          "output": ventil
+        };
+
+        // Faire une requête GET à l'API
+        const response = fetch(apiEndpoint,
+        {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify(config)
+        });
+
+      }
+
+      async function updateBtn() {
+        // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+        const apiEndpoint = 'http://raspberrypizero:3000/reboot';
+
+        // Faire une requête GET à l'API
+        const response = await fetch(apiEndpoint,
+        {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "same-origin", // include, *same-origin, omit
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        });
+      }
+      
+      async function updateBtnValider() {
+        // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+        const apiEndpoint = 'http://raspberrypizero:3000/set_config';
+
+        let config = {
+          field :"cons_hum",
+          value : "60"
+        };
+
+        config.value = cons.value;
+        // Faire une requête GET à l'API
+        const response = await fetch(apiEndpoint,
+        {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "same-origin", // include, *same-origin, omit
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify(config)
+        });
+
+        if (response.ok) {
+          d1.style.visibility = "visible";
+        }else {
+          d1.style.visibility = "hidden";
+        }
+
+
+
+      }
+
+  </script>
+</div>
+
+{% endblock %}

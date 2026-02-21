@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block body %}
+<div class="jumbotron">
+  <h1>Bienvenue</h1>
+  <p class="lead">Gestionnaire de température et d'hydrométrie de la salle de bain.</p>
+</div>
+<div>
+  <h1>Temperature : </h1>
+  <div id="temperature">Loading...</div>
+  <h1>Humidité : </h1>
+  <div id="humidité">Loading...</div>
+  <h1>Consigne : </h1>
+  <div id="Consigne">Loading...</div>
+  <script>
+      // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+      const apiEndpoint = 'http://raspberrypizero:3000/get_humidity';
+      const apiEndpointConfig = 'http://raspberrypizero:3000/get_config';
+      // Function to fetch temperature data from the API
+      async function fetchTemperature() {
+          try {
+              
+            //const response = await fetch(apiEndpoint);
+              // Faire une requête GET à l'API
+              const response = await fetch(apiEndpoint)
+              //print("demande de l'API Sensor")
+              const data = await response.json();
+
+              // Faire une requête GET à l'API
+              const response2 = await fetch(apiEndpointConfig)
+              //print("demande de l'API Sensor")
+              const conf = await response2.json();
+              const repConsigne = conf['reponse'][0][2];
+
+              let element1 = document.getElementById("temperature");
+              element1.textContent = `${data.temperature} °C`;
+              element1.style.fontSize = "70px";
+              element1.style.color = "blue";
+              // Update the temperature display
+              let element2 = document.getElementById("humidité");
+              element2.textContent = `${data.humidity} %`;
+              element2.style.fontSize = "70px";
+              element2.style.color = "red";
+
+              let element3 = document.getElementById("Consigne");
+              element3.textContent = `${repConsigne} %`;
+              element3.style.fontSize = "70px";
+              element3.style.color = "green";
+              //document.getElementById('humidité').textContent = `${data.humidity} °C`;
+              // Call a function to draw the chart with data.points
+              //drawChart(data.points);
+          } catch (error) {
+              console.error('Error fetching temperature:', error);
+          }
+      }
+
+      // Fetch temperature data when the page loads
+      window.onload = fetchTemperature;
+  </script>
+
+
+
+
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+
+humidity sensor
+
+pi
+simpson
+
+
+
+sudo apt update
+sudo apt upgrade
+
+sudo apt install git
+git --version
+
+
+
+git clone https://github.com/adafruit/Adafruit_Python_DHT.git
+cd Adafruit_Python_DHT
+sudo apt-get update
+sudo apt-get install build-essential python-dev
+sudo python setup.py install
+
+
+sudo apt-get install python3-pip
+sudo python3 -m pip install --upgrade pip setuptools wheel
+
+sudo pip3 install Adafruit_DHT
+
+pour connaitre la place disque dur
+********************************************************************************
+df -h
+
+pour installer sqlite3
+********************************************************************************
+sudo apt install sqlite3
+sqlite3 test.db
+create table test (filed1 INT, field2 TEXT);
+insert into test VALUES (123,'My String');
+select * from test;
+
+
+CREATE TABLE "datasensor" (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	datetime DATETIME
+, temperature REAL, humidity REAL, "output" TEXT);
+
+
+INSERT INTO datasensor(datetime, temperature, humidity, "output") 
+VALUES('2023/04/11 08:09:00',24.7,45.0,'False');
+select * from datasensor;
+
+
+
+pour executer un prog python
+********************************************************************************
+cat <<! > raspi.py
+(on colle le code)
+nano raspi.py (pour l'editer)
+chmod +x raspi.py (pour le rendre executable)
+sudo ./raspi.py
+
+
+
+Pour connaitre le PID :
+********************************************************************************
+ps -auxw | grep humidity
+
+
+Pour tuer le processus : (-9 signal kill)
+********************************************************************************
+sudo kill -9 ton_pid 
+
+
+Crontab
+**********************************************************************************
+sudo crontab -editer
+sudo crontab -l
+
+Voir les logs
+---*****************************************************************************
+/var/loc
+dmesg 
+cat dpkg.log 
+tail -n 20 dpkg.log 
+
+
+
+
+
+*******************************************************************************************************
+installer un partage samba
+
+sudo apt-get install samba samba-common-bin
+sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.org
+
+sudo nano /etc/samba/smb.conf.org
+Trouvez les lignes et décommentez les (enlevez les # du début de ligne des deux dernières lignes uniquement)
+
+# The specific set of interfaces / networks to bind to
+# This can be either the interface name or an IP address/netmask;
+# interface names are normally preferred
+interfaces = 127.0.0.0/8 eth0
+bind interfaces only = yes
+
+
+Attention problème d'IP, il faut mettre l'adresse du PI
+interfaces = 192.168.1.9/8 eth0
+
+
+
+Créez le dossier que vous souhaitez partager (s’il n’existe pas). J’ai choisi /home/pi/partage.
+mkdir partage
+chmod 777 partage
+ 
+Créer un user spécifique  
+sudo adduser smbuser
+sudo smbpasswd -a smbuser
+ 
+ 
+ 
+ 
+Maintenant rendez vous à la fin du fichier… oui, tout en bas et ajoutez :
+[Partage]
+comment = Partage Samba sur Raspberry Pi
+path = /home/pi/partage
+writable = yes
+guest ok = yes
+guest only = yes
+create mode = 0777
+directory mode = 0777
+share modes = yes
+browseable = yes
+valid users = smbuser
+
+Pour y acceder dans windows
+\\raspberrypizero\partage
+usersmb
+simpson
+
+
+
+
+
+
+sudo raspi-config - Modifier le hostname
+sudo systemctl restart smbd.service
