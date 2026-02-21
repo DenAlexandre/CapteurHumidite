@@ -112,13 +112,10 @@ public partial class ChartsViewModel : ObservableObject
                 _ => (TimeSpan.FromHours(1), "HH:mm")
             };
 
-            var xMin = data.Count > 0 ? data.First().DateTime.Ticks : start.Ticks;
-            var xMax = data.Count > 0 ? data.Last().DateTime.Ticks : end.Ticks;
-
             XAxes = [new DateTimeAxis(unit, d => d.ToString(labelFormat))
             {
-                MinLimit = xMin,
-                MaxLimit = xMax
+                MinLimit = start.Ticks,
+                MaxLimit = end.Ticks
             }];
 
             TemperatureSeries =
