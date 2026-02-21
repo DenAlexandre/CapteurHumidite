@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HumiditySensorApp.ViewModels"
+             xmlns:converters="clr-namespace:HumiditySensorApp.Converters"
+             x:Class="HumiditySensorApp.Views.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             Title="Accueil">
+
+    <ContentPage.Resources>
+        <converters:BoolToColorConverter x:Key="BoolToColor" />
+        <converters:InvertBoolConverter x:Key="InvertBool" />
+    </ContentPage.Resources>
+
+    <Grid>
+
+        <!-- Waiting Overlay -->
+        <VerticalStackLayout IsVisible="{Binding IsWaiting}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="16"
+                             Padding="32">
+            <ActivityIndicator IsRunning="{Binding IsWaiting}"
+                               Color="#1976D2"
+                               HeightRequest="50"
+                               WidthRequest="50"
+                               HorizontalOptions="Center" />
+            <Label Text="{Binding WaitingMessage}"
+                   FontSize="16"
+                   TextColor="#757575"
+                   HorizontalTextAlignment="Center" />
+            <Button Text="Réessayer maintenant"
+                    Command="{Binding LoadDataCommand}"
+                    BackgroundColor="#1976D2"
+                    TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="40"
+                    FontSize="14"
+                    HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Main Content -->
+        <RefreshView Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsRefreshing}"
+                     IsVisible="{Binding IsWaiting, Converter={StaticResource InvertBool}}">
+            <ScrollView>
+                <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="12">
+
+                    <!-- Error Banner -->
+                    <Border Grid.Row="0"
+                            BackgroundColor="#FFEBEE"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="#EF5350"
+                            Padding="12"
+                            IsVisible="{Binding HasError}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{Binding ErrorMessage}"
+                                   TextColor="#C62828"
+                                   FontSize="14" />
+                            <Button Text="Réessayer"
+                                    Command="{Binding LoadDataCommand}"
+                                    BackgroundColor="#EF5350"
+                                    TextColor="White"
+                                    HeightRequest="36"
+                                    CornerRadius="4"
+                                    FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Loading -->
+                    <ActivityIndicator Grid.Row="1"
+                                       IsRunning="{Binding IsLoading}"
+                                       IsVisible="{Binding IsLoading}"
+                                       Color="#1976D2"
+                                       HeightRequest="40" />
+
+                    <!-- Cards Grid -->
+                    <Grid Grid.Row="2"
+                          ColumnDefinitions="*,*"
+                          RowDefinitions="*,*"
+                          ColumnSpacing="12"
+                          RowSpacing="12">
+
+                        <!-- Temperature Card -->
+                        <Border Grid.Row="0" Grid.Column="0"
+                                BackgroundColor="#E3F2FD"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="Transparent"
+                                Padding="16">
+                            <VerticalStackLayout Spacing="8"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center">
+                                <Label Text="Température"
+                                       FontSize="14"
+                                       TextColor="#1565C0"
+                                       HorizontalOptions="Center" />
+                                <Label Text="{Binding Temperature, StringFormat='{0:F1} °C'}"
+                                       FontSize="32"
+                                       FontAttributes="Bold"
+                                       TextColor="#0D47A1"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Humidity Card -->
+                        <Border Grid.Row="0" Grid.Column="1"
+                                BackgroundColor="{Binding IsHumidityOverSetpoint, Converter={StaticResource BoolToColor}}"
+                                Opacity="0.15"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="Transparent"
+                                Padding="0"
+                                InputTransparent="True" />
+                        <Border Grid.Row="0" Grid.Column="1"
+                                BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="Transparent"
+                                Padding="16">
+                            <VerticalStackLayout Spacing="8"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center">
+                                <Label Text="Humidité"
+                                       FontSize="14"
+                                       TextColor="{Binding IsHumidityOverSetpoint, Converter={StaticResource BoolToColor}}"
+                                       HorizontalOptions="Center" />
+                                <Label Text="{Binding Humidity, StringFormat='{0:F1} %'}"
+                                       FontSize="32"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding IsHumidityOverSetpoint, Converter={StaticResource BoolToColor}}"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Setpoint Card -->
+                        <Border Grid.Row="1" Grid.Column="0"
+                                BackgroundColor="#FFF3E0"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="Transparent"
+                                Padding="16">
+                            <VerticalStackLayout Spacing="8"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center">
+                                <Label Text="Consigne"
+                                       FontSize="14"
+                                       TextColor="#E65100"
+                                       HorizontalOptions="Center" />
+                                <Label Text="{Binding Setpoint, StringFormat='{0} %'}"
+                                       FontSize="32"
+                                       FontAttributes="Bold"
+                                       TextColor="#BF360C"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Ventilation Card -->
+                        <Border Grid.Row="1" Grid.Column="1"
+                                BackgroundColor="#E8F5E9"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="Transparent"
+                                Padding="16">
+                            <VerticalStackLayout Spacing="8"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center">
+                                <Label Text="Ventilation"
+                                       FontSize="14"
+                                       TextColor="#2E7D32"
+                                       HorizontalOptions="Center" />
+                                <Label Text="{Binding IsHumidityOverSetpoint, StringFormat='{0}'}"
+                                       FontSize="28"
+                                       FontAttributes="Bold"
+                                       TextColor="#1B5E20"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </Grid>
+                </Grid>
+            </ScrollView>
+        </RefreshView>
+
+    </Grid>
+
+</ContentPage>

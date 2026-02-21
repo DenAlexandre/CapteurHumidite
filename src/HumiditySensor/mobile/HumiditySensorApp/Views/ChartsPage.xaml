@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HumiditySensorApp.ViewModels"
+             xmlns:converters="clr-namespace:HumiditySensorApp.Converters"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
+             x:Class="HumiditySensorApp.Views.ChartsPage"
+             x:DataType="vm:ChartsViewModel"
+             Title="Courbes">
+
+    <ContentPage.Resources>
+        <converters:InvertBoolConverter x:Key="InvertBool" />
+    </ContentPage.Resources>
+
+    <Grid>
+
+        <!-- Waiting Overlay -->
+        <VerticalStackLayout IsVisible="{Binding IsWaiting}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="16"
+                             Padding="32">
+            <ActivityIndicator IsRunning="{Binding IsWaiting}"
+                               Color="#1976D2"
+                               HeightRequest="50"
+                               WidthRequest="50"
+                               HorizontalOptions="Center" />
+            <Label Text="{Binding WaitingMessage}"
+                   FontSize="16"
+                   TextColor="#757575"
+                   HorizontalTextAlignment="Center" />
+            <Button Text="Réessayer"
+                    Command="{Binding LoadDataCommand}"
+                    BackgroundColor="#1976D2"
+                    TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="40"
+                    FontSize="14"
+                    HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Main Content -->
+        <Grid RowDefinitions="Auto,Auto,*,*" Padding="16" RowSpacing="12"
+              IsVisible="{Binding IsWaiting, Converter={StaticResource InvertBool}}">
+
+            <!-- Error Banner -->
+            <Border Grid.Row="0"
+                    BackgroundColor="#FFEBEE"
+                    StrokeShape="RoundRectangle 8"
+                    Stroke="#EF5350"
+                    Padding="12"
+                    IsVisible="{Binding HasError}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#C62828"
+                           FontSize="14" />
+                    <Button Text="Réessayer"
+                            Command="{Binding LoadDataCommand}"
+                            BackgroundColor="#EF5350"
+                            TextColor="White"
+                            HeightRequest="36"
+                            CornerRadius="4"
+                            FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Period Selector -->
+            <HorizontalStackLayout Grid.Row="1" Spacing="8" HorizontalOptions="Center">
+                <Picker Title="Période"
+                        ItemsSource="{Binding Periods}"
+                        SelectedItem="{Binding SelectedPeriod}"
+                        WidthRequest="200"
+                        FontSize="16" />
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   IsVisible="{Binding IsLoading}"
+                                   Color="#1976D2"
+                                   HeightRequest="30"
+                                   WidthRequest="30" />
+            </HorizontalStackLayout>
+
+            <!-- Temperature Chart -->
+            <Border Grid.Row="2"
+                    StrokeShape="RoundRectangle 8"
+                    Stroke="#E0E0E0"
+                    Padding="4">
+                <Grid RowDefinitions="Auto,*">
+                    <Label Text="Température (°C)"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#E65100"
+                           Margin="8,4,0,0" />
+                    <lvc:CartesianChart Grid.Row="1"
+                                        Series="{Binding TemperatureSeries}"
+                                        YAxes="{Binding TemperatureYAxes}"
+                                        XAxes="{Binding XAxes}"
+                                        ZoomMode="X" />
+                </Grid>
+            </Border>
+
+            <!-- Humidity Chart -->
+            <Border Grid.Row="3"
+                    StrokeShape="RoundRectangle 8"
+                    Stroke="#E0E0E0"
+                    Padding="4">
+                <Grid RowDefinitions="Auto,*">
+                    <Label Text="Humidité (%)"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#1565C0"
+                           Margin="8,4,0,0" />
+                    <lvc:CartesianChart Grid.Row="1"
+                                        Series="{Binding HumiditySeries}"
+                                        YAxes="{Binding HumidityYAxes}"
+                                        XAxes="{Binding XAxes}"
+                                        ZoomMode="X" />
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
