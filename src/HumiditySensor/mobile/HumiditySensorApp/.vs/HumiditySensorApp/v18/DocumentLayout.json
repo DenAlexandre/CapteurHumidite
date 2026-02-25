@@ -1,7 +1,12 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\GitHub\\CapteurHumidite\\src\\HumiditySensor\\mobile\\HumiditySensorApp\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\GitHub\\CapteurHumidite\\src\\HumiditySensor\\mobile\\HumiditySensorApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{35173801-5926-5773-F40B-8B7708485301}|HumiditySensorApp.csproj|c:\\github\\capteurhumidite\\src\\humiditysensor\\mobile\\humiditysensorapp\\mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{35173801-5926-5773-F40B-8B7708485301}|HumiditySensorApp.csproj|solutionrelative:mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -18,6 +23,19 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MauiProgram.cs",
+              "DocumentMoniker": "C:\\GitHub\\CapteurHumidite\\src\\HumiditySensor\\mobile\\HumiditySensorApp\\MauiProgram.cs",
+              "RelativeDocumentMoniker": "MauiProgram.cs",
+              "ToolTip": "C:\\GitHub\\CapteurHumidite\\src\\HumiditySensor\\mobile\\HumiditySensorApp\\MauiProgram.cs",
+              "RelativeToolTip": "MauiProgram.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAgwDMAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-25T14:19:57.938Z",
+              "EditorCaption": ""
             }
           ]
         }
