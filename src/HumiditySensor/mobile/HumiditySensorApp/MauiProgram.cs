@@ -3,7 +3,6 @@ using HumiditySensorApp.ViewModels;
 using HumiditySensorApp.Views;
 using LiveChartsCore.SkiaSharpView.Maui;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace HumiditySensorApp;
@@ -33,11 +32,14 @@ public static class MauiProgram
 
         builder.Configuration.AddConfiguration(config);
 
-        builder.Services.AddHttpClient<ISensorApiService, SensorApiService>((sp, client) =>
+        // API Settings (persistant via Preferences, fallback sur appsettings.json)
+        var defaultUrl = builder.Configuration["SensorApi:BaseAddress"] ?? "http://raspberrypizero:3000";
+        builder.Services.AddSingleton<IApiSettingsService>(new ApiSettingsService(defaultUrl));
+
+        var timeoutSeconds = builder.Configuration.GetValue<int?>("SensorApi:TimeoutSeconds") ?? 10;
+        builder.Services.AddHttpClient<ISensorApiService, SensorApiService>(client =>
         {
-            var config = sp.GetRequiredService<IConfiguration>();
-            client.BaseAddress = new Uri(config["SensorApi:BaseAddress"]!);
-            client.Timeout = TimeSpan.FromSeconds(config.GetValue<int>("SensorApi:TimeoutSeconds"));
+            client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
         });
 
         // ViewModels
