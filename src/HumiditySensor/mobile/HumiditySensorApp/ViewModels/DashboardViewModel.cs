@@ -7,6 +7,7 @@ namespace HumiditySensorApp.ViewModels;
 public partial class DashboardViewModel : ObservableObject
 {
     private readonly ISensorApiService _api;
+    private readonly IApiSettingsService _settings;
     private IDispatcherTimer? _timer;
 
     [ObservableProperty]
@@ -42,11 +43,16 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private string _waitingMessage = string.Empty;
 
-    private bool _hasLoadedOnce;
+    [ObservableProperty]
+    private bool _showConfigureUrl;
 
-    public DashboardViewModel(ISensorApiService api)
+    private bool _hasLoadedOnce;
+    private int _failCount;
+
+    public DashboardViewModel(ISensorApiService api, IApiSettingsService settings)
     {
         _api = api;
+        _settings = settings;
     }
 
     public void StartAutoRefresh(IDispatcher dispatcher)
@@ -97,13 +103,17 @@ public partial class DashboardViewModel : ObservableObject
             IsVentilationOn = config.IsManualMode;
             IsHumidityOverSetpoint = reading.Humidity > config.Setpoint;
             _hasLoadedOnce = true;
+            _failCount = 0;
             IsWaiting = false;
+            ShowConfigureUrl = false;
         }
         catch (Exception ex)
         {
+            _failCount++;
             if (!_hasLoadedOnce)
             {
                 IsWaiting = true;
+                ShowConfigureUrl = _failCount >= 2;
                 WaitingMessage = "Serveur indisponible.\nNouvelle tentative dans 30s...";
             }
             else
@@ -123,6 +133,35 @@ public partial class DashboardViewModel : ObservableObject
     private async Task RefreshAsync()
     {
         IsRefreshing = true;
+        await LoadDataAsync();
+    }
+
+    [RelayCommand]
+    private async Task ChangeApiUrlAsync()
+    {
+        var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+        if (page is null) return;
+
+        var currentUrl = _settings.BaseUrl;
+        var newUrl = await page.DisplayPromptAsync(
+            "Configuration",
+            "Entrez l'URL du serveur :",
+            "OK",
+            "Annuler",
+            currentUrl,
+            keyboard: Keyboard.Url);
+
+        if (string.IsNullOrWhiteSpace(newUrl)) return;
+
+        if (!newUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !newUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            newUrl = "http://" + newUrl;
+        }
+
+        _settings.SetBaseUrl(newUrl);
+        _failCount = 0;
+        ShowConfigureUrl = false;
         await LoadDataAsync();
     }
 }

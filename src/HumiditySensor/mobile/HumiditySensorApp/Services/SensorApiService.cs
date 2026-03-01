@@ -8,15 +8,19 @@ namespace HumiditySensorApp.Services;
 public class SensorApiService : ISensorApiService
 {
     private readonly HttpClient _http;
+    private readonly IApiSettingsService _settings;
 
-    public SensorApiService(HttpClient http)
+    public SensorApiService(HttpClient http, IApiSettingsService settings)
     {
         _http = http;
+        _settings = settings;
     }
+
+    private string Url(string path) => $"{_settings.BaseUrl}{path}";
 
     public async Task<HumidityReading> GetHumidityAsync()
     {
-        var response = await _http.GetAsync("/get_humidity");
+        var response = await _http.GetAsync(Url("/get_humidity"));
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
@@ -31,7 +35,7 @@ public class SensorApiService : ISensorApiService
 
     public async Task<AppConfig> GetConfigAsync()
     {
-        var response = await _http.GetAsync("/get_config");
+        var response = await _http.GetAsync(Url("/get_config"));
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
@@ -64,7 +68,7 @@ public class SensorApiService : ISensorApiService
             datetime_end = end.ToString("yyyy-MM-dd HH:mm:ss")
         });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
-        var response = await _http.PostAsync("/get_sensors_data", content);
+        var response = await _http.PostAsync(Url("/get_sensors_data"), content);
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
@@ -103,7 +107,7 @@ public class SensorApiService : ISensorApiService
     {
         var body = JsonSerializer.Serialize(new { field, value });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
-        var response = await _http.PostAsync("/set_config", content);
+        var response = await _http.PostAsync(Url("/set_config"), content);
         response.EnsureSuccessStatusCode();
     }
 
@@ -111,7 +115,7 @@ public class SensorApiService : ISensorApiService
     {
         var body = JsonSerializer.Serialize(new { output = on ? "true" : "false" });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
-        var response = await _http.PostAsync("/set_outputRelayPin17", content);
+        var response = await _http.PostAsync(Url("/set_outputRelayPin17"), content);
         response.EnsureSuccessStatusCode();
     }
 
@@ -120,7 +124,7 @@ public class SensorApiService : ISensorApiService
         var content = new StringContent("{}", Encoding.UTF8, "application/json");
         try
         {
-            await _http.PostAsync("/reboot", content);
+            await _http.PostAsync(Url("/reboot"), content);
         }
         catch (HttpRequestException) { }
         catch (TaskCanceledException) { }

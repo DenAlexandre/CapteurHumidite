@@ -37,6 +37,15 @@
                     HeightRequest="40"
                     FontSize="14"
                     HorizontalOptions="Center" />
+            <Button Text="Configurer l'URL du serveur"
+                    Command="{Binding ChangeApiUrlCommand}"
+                    IsVisible="{Binding ShowConfigureUrl}"
+                    BackgroundColor="#FF9800"
+                    TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="40"
+                    FontSize="14"
+                    HorizontalOptions="Center" />
         </VerticalStackLayout>
 
         <!-- Main Content -->
@@ -57,13 +66,22 @@
                             <Label Text="{Binding ErrorMessage}"
                                    TextColor="#C62828"
                                    FontSize="14" />
-                            <Button Text="Réessayer"
-                                    Command="{Binding LoadDataCommand}"
-                                    BackgroundColor="#EF5350"
-                                    TextColor="White"
-                                    HeightRequest="36"
-                                    CornerRadius="4"
-                                    FontSize="13" />
+                            <HorizontalStackLayout Spacing="8">
+                                <Button Text="Réessayer"
+                                        Command="{Binding LoadDataCommand}"
+                                        BackgroundColor="#EF5350"
+                                        TextColor="White"
+                                        HeightRequest="36"
+                                        CornerRadius="4"
+                                        FontSize="13" />
+                                <Button Text="Changer l'URL"
+                                        Command="{Binding ChangeApiUrlCommand}"
+                                        BackgroundColor="#FF9800"
+                                        TextColor="White"
+                                        HeightRequest="36"
+                                        CornerRadius="4"
+                                        FontSize="13" />
+                            </HorizontalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
