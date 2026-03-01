@@ -5,7 +5,6 @@ using LiveChartsCore.SkiaSharpView.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SkiaSharp.Views.Maui.Controls.Hosting;
-using Microsoft.Extensions.Configuration;
 
 namespace HumiditySensorApp;
 
